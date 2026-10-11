@@ -3,9 +3,15 @@
 Records mouse and keyboard input system-wide and plays it back with the original timing.
 Windows-only, C# / WinForms, .NET 8, no third-party dependencies.
 
-## Run
+## Download
 
-`publish\MacroRecorder.exe` (needs the .NET 8 Desktop Runtime), or `dotnet run` from this folder.
+1. Grab `MacroRecorder-*-win-x64.zip` from the [latest release](https://github.com/xoGUYFAWKSxo/macro-recorder/releases/latest).
+2. Extract it to a folder (keep all the files together) and run `MacroRecorder.exe`.
+
+Requires the [.NET 8 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/8.0) (x64); Windows offers to
+install it if it's missing. The exe isn't code-signed, so SmartScreen may warn — choose **More info → Run anyway**.
+
+To run from source instead, see [Build](#build).
 
 ## Use
 
@@ -19,7 +25,6 @@ Windows-only, C# / WinForms, .NET 8, no third-party dependencies.
   `%APPDATA%\MacroRecorder\settings.json`.
 - **Countdown** – a large click-through number appears on the monitor your mouse is on, so you can
   switch to the target app before recording begins. Press the record hotkey again to cancel.
-
 - **Speed ×** – playback speed multiplier (2 = twice as fast).
 - **Repeat** – number of loops; `0` loops until you press the play hotkey.
 - **Record mouse movement** – untick to record only clicks, wheel and keys (clicks still remember where they happened, so the cursor jumps there).
@@ -38,7 +43,13 @@ Notes:
 
 ## Build
 
+Needs the .NET 8 SDK.
+
 ```
-dotnet build -c Release
-dotnet publish -c Release -o publish
+dotnet run                               # build and launch
+dotnet publish -c Release -o publish     # produces publish\MacroRecorder.exe (git-ignored)
 ```
+
+## License
+
+[MIT](LICENSE)
