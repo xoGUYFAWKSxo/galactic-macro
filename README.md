@@ -5,6 +5,14 @@
 Records mouse and keyboard input system-wide and plays it back with the original timing.
 Windows-only, C# / WinForms, .NET 8, no third-party dependencies.
 
+## Screenshots
+
+![Galactic Macro main window with a recorded macro](docs/screenshots/main-window.png)
+
+| Installer | Settings | Countdown before recording |
+|---|---|---|
+| <img src="docs/screenshots/installer.png" width="300" alt="Installer welcome page"> | <img src="docs/screenshots/settings.png" width="300" alt="Settings dialog with hotkeys and countdown"> | <img src="docs/screenshots/countdown.png" width="160" alt="Countdown overlay"> |
+
 ## Download
 
 1. Download `GalacticMacro-Setup-*.exe` from the [latest release](https://github.com/xoGUYFAWKSxo/galactic-macro/releases/latest).
