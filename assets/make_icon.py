@@ -3,12 +3,12 @@ bottom-right corner. galaxy.py is copied from the Internet Downloader project's 
 
 Needs Pillow and NumPy:  python make_icon.py
 Writes icon.png (1024 x 1024), icon.ico (16-256 px) and the installer's wizard-*.bmp images next to
-this script. The galaxy is seeded,
+this script, and the GitHub social preview to ../docs/social-preview.png. The galaxy is seeded,
 so the output is the same every time."""
 from pathlib import Path
 
 import numpy as np
-from PIL import Image, ImageDraw, ImageFilter
+from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 import galaxy
 
@@ -137,6 +137,37 @@ def wizard_images(icon_img):
         small.convert('RGB').save(HERE / name)
 
 
+
+def social_preview(icon_img):
+    """1280 x 640 card for link previews: starfield, a large faint galaxy, the icon, name and tagline."""
+    w, h = 1280, 640
+    gs = 1100
+    light = galaxy.galaxy(gs, 0.45 * gs, gs / 2, gs / 2, rot=np.deg2rad(-28))
+    g = galaxy.tonemap(light, 2.2) * 0.55
+    big = np.zeros((h, w, 3))
+    x0, y0 = w - gs // 2 - 230, h // 2 - gs // 2  # galaxy centred right of the text, bleeding off the edges
+    sx0, sy0 = max(0, -x0), max(0, -y0)
+    dx0, dy0 = max(0, x0), max(0, y0)
+    cw, ch = min(w - dx0, gs - sx0), min(h - dy0, gs - sy0)
+    big[dy0:dy0 + ch, dx0:dx0 + cw] = g[sy0:sy0 + ch, sx0:sx0 + cw]
+    card = galaxy.to_image(galaxy.screen(galaxy.background(w, h, seed=5), big)).convert('RGBA')
+
+    ic = 300
+    card.alpha_composite(icon_img.resize((ic, ic), Image.LANCZOS), (90, (h - ic) // 2))
+
+    d = ImageDraw.Draw(card)
+    fonts = Path('C:/Windows/Fonts')
+    title = ImageFont.truetype(str(fonts / 'segoeuib.ttf'), 96)
+    tag = ImageFont.truetype(str(fonts / 'segoeui.ttf'), 38)
+    small = ImageFont.truetype(str(fonts / 'seguisb.ttf'), 28)
+    tx = 90 + ic + 60
+    d.text((tx, 190), 'Galactic Macro', font=title, fill=(255, 255, 255))
+    d.text((tx, 318), 'Record and play back mouse and', font=tag, fill=(205, 220, 255))
+    d.text((tx, 364), 'keyboard macros on Windows', font=tag, fill=(205, 220, 255))
+    d.text((tx, 440), 'Custom hotkeys  ·  Countdown  ·  Free & open source', font=small, fill=tuple(GLOW))
+    card.convert('RGB').save(HERE.parent / 'docs' / 'social-preview.png', optimize=True)
+
+
 if __name__ == '__main__':
     img = compose()
     img.save(HERE / 'icon.png')
@@ -144,3 +175,4 @@ if __name__ == '__main__':
     frames = [scaled(img, s) for s in sizes]
     frames[0].save(HERE / 'icon.ico', sizes=[(s, s) for s in sizes], append_images=frames[1:])
     wizard_images(img)
+    social_preview(img)
