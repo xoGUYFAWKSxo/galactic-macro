@@ -9,6 +9,11 @@
     <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
     <AssemblyName>GalacticMacro</AssemblyName>
     <RootNamespace>GalacticMacro</RootNamespace>
+    <Version>1.2.0</Version>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+    <Product>Galactic Macro</Product>
+    <Company>xoGUYFAWKSxo</Company>
+    <Copyright>Copyright (c) 2026 xoGUYFAWKSxo</Copyright>
     <ApplicationIcon>assets\icon.ico</ApplicationIcon>
   </PropertyGroup>
 

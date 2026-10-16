@@ -2,7 +2,8 @@
 bottom-right corner. galaxy.py is copied from the Internet Downloader project's store assets.
 
 Needs Pillow and NumPy:  python make_icon.py
-Writes icon.png (1024 x 1024) and icon.ico (16-256 px) next to this script. The galaxy is seeded,
+Writes icon.png (1024 x 1024), icon.ico (16-256 px) and the installer's wizard-*.bmp images next to
+this script. The galaxy is seeded,
 so the output is the same every time."""
 from pathlib import Path
 
@@ -116,9 +117,30 @@ def scaled(img, px):
     return small
 
 
+def wizard_images(icon_img):
+    """Installer artwork: the tall welcome-page panel and the small header image, each at 100% and 200%."""
+    w, h = 328, 628
+    light = galaxy.galaxy(h, 0.45 * h, h / 2, h * 0.40, rot=np.deg2rad(-28))
+    g = galaxy.tonemap(light, 2.2)[:, (h - w) // 2:(h + w) // 2]
+    panel = galaxy.to_image(galaxy.screen(galaxy.background(w, h, seed=11), g)).convert('RGBA')
+    bot = robot()
+    bot = bot.crop(bot.getbbox())
+    bw = 200
+    bot = bot.resize((bw, round(bot.height * bw / bot.width)), Image.LANCZOS)
+    panel.alpha_composite(bot, ((w - bw) // 2, h - bot.height - 40))
+    panel = panel.convert('RGB')
+    panel.save(HERE / 'wizard-large-200.bmp')
+    panel.resize((w // 2, h // 2), Image.LANCZOS).save(HERE / 'wizard-large-100.bmp')
+    for px, name in ((55, 'wizard-small-100.bmp'), (110, 'wizard-small-200.bmp')):
+        small = Image.new('RGBA', (px, px), (255, 255, 255, 255))
+        small.alpha_composite(scaled(icon_img, px))
+        small.convert('RGB').save(HERE / name)
+
+
 if __name__ == '__main__':
     img = compose()
     img.save(HERE / 'icon.png')
     sizes = [256, 128, 64, 48, 40, 32, 24, 20, 16]
     frames = [scaled(img, s) for s in sizes]
     frames[0].save(HERE / 'icon.ico', sizes=[(s, s) for s in sizes], append_images=frames[1:])
+    wizard_images(img)
