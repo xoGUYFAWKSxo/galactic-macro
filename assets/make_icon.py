@@ -1,0 +1,124 @@
+"""Builds the Galactic Macro app icon: the spiral galaxy from galaxy.py with a robot face in the
+bottom-right corner. galaxy.py is copied from the Internet Downloader project's store assets.
+
+Needs Pillow and NumPy:  python make_icon.py
+Writes icon.png (1024 x 1024) and icon.ico (16-256 px) next to this script. The galaxy is seeded,
+so the output is the same every time."""
+from pathlib import Path
+
+import numpy as np
+from PIL import Image, ImageDraw, ImageFilter
+
+import galaxy
+
+HERE = Path(__file__).parent
+SIZE = 1024
+SS = 4  # supersampling for the robot's vector shapes
+
+OUTLINE = (12, 16, 40, 255)
+METAL_TOP = np.array([236, 242, 252])
+METAL_BOTTOM = np.array([140, 156, 184])
+VISOR = (18, 26, 58, 255)
+GLOW = (90, 230, 255)
+BULB = (255, 92, 120)
+
+
+def box(x0, y0, x1, y1):
+    return [v * SS for v in (x0, y0, x1, y1)]
+
+
+def gradient_fill(layer, shape_mask, top_y, bottom_y):
+    """Paints a vertical metal gradient into `layer` wherever `shape_mask` is set."""
+    S = layer.size[0]
+    t = np.clip((np.arange(S) - top_y * SS) / ((bottom_y - top_y) * SS), 0, 1)[:, None, None]
+    rgb = METAL_TOP * (1 - t) + METAL_BOTTOM * t
+    grad = np.broadcast_to(rgb, (S, S, 3)).astype(np.uint8)
+    layer.paste(Image.fromarray(grad, 'RGB'), (0, 0), shape_mask)
+
+
+def robot():
+    """Returns the robot as a SIZE x SIZE RGBA layer (transparent elsewhere)."""
+    S = SIZE * SS
+    layer = Image.new('RGBA', (S, S), (0, 0, 0, 0))
+    d = ImageDraw.Draw(layer)
+    ol = 16 * SS  # outline width
+
+    # Head geometry (in 1024 px units).
+    hx0, hy0, hx1, hy1 = 548, 600, 948, 924
+    cx = (hx0 + hx1) / 2
+
+    # Antenna: stalk and glowing bulb.
+    d.rounded_rectangle(box(cx - 13, 510, cx + 13, hy0 + 10), radius=13 * SS, fill=OUTLINE)
+    d.rounded_rectangle(box(cx - 5, 518, cx + 5, hy0 + 10), radius=5 * SS, fill=tuple(METAL_BOTTOM) + (255,))
+    d.ellipse(box(cx - 40, 468, cx + 40, 548), fill=OUTLINE)
+    d.ellipse(box(cx - 26, 482, cx + 26, 534), fill=BULB + (255,))
+
+    # Ears.
+    for ex0, ex1 in ((hx0 - 42, hx0 + 10), (hx1 - 10, hx1 + 42)):
+        d.rounded_rectangle(box(ex0, 700, ex1, 824), radius=22 * SS, fill=OUTLINE)
+        m = Image.new('L', (S, S), 0)
+        ImageDraw.Draw(m).rounded_rectangle(box(ex0 + 14, 714, ex1 - 14, 810), radius=12 * SS, fill=255)
+        gradient_fill(layer, m, 700, 824)
+
+    # Head: dark outline, then a metal gradient body.
+    d.rounded_rectangle(box(hx0, hy0, hx1, hy1), radius=78 * SS, fill=OUTLINE)
+    body = Image.new('L', (S, S), 0)
+    ImageDraw.Draw(body).rounded_rectangle(
+        [hx0 * SS + ol, hy0 * SS + ol, hx1 * SS - ol, hy1 * SS - ol], radius=64 * SS, fill=255)
+    gradient_fill(layer, body, hy0, hy1)
+    d = ImageDraw.Draw(layer)
+
+    # Visor (face plate).
+    vx0, vy0, vx1, vy1 = hx0 + 46, hy0 + 72, hx1 - 46, hy1 - 46
+    d.rounded_rectangle(box(vx0, vy0, vx1, vy1), radius=46 * SS, fill=VISOR)
+
+    # Eyes and mouth on their own layer so they can glow.
+    face = Image.new('RGBA', (S, S), (0, 0, 0, 0))
+    f = ImageDraw.Draw(face)
+    ey = vy0 + 72
+    for ex in (cx - 78, cx + 78):
+        f.ellipse(box(ex - 40, ey - 40, ex + 40, ey + 40), fill=GLOW + (255,))
+    my = vy1 - 52
+    f.rounded_rectangle(box(cx - 92, my - 13, cx + 92, my + 13), radius=13 * SS, fill=GLOW + (255,))
+    for gx in (cx - 46, cx, cx + 46):  # grille gaps
+        f.rectangle(box(gx - 5, my - 13, gx + 5, my + 13), fill=VISOR)
+
+    glow = face.filter(ImageFilter.GaussianBlur(18 * SS))
+    layer = Image.alpha_composite(layer, glow)
+    layer = Image.alpha_composite(layer, face)
+    # Pupils: small bright highlights.
+    d = ImageDraw.Draw(layer)
+    for ex in (cx - 78, cx + 78):
+        d.ellipse(box(ex - 4, ey - 26, ex + 22, ey), fill=(235, 255, 255, 255))
+
+    return layer.resize((SIZE, SIZE), Image.LANCZOS)
+
+
+def compose():
+    base = galaxy.icon(SIZE)
+    bot = robot()
+    # Drop shadow so the robot stands off the galaxy.
+    a = np.asarray(bot)[..., 3].astype(float) / 255
+    shadow = Image.fromarray((a * 200).astype(np.uint8), 'L').filter(ImageFilter.GaussianBlur(14))
+    shadow_rgba = Image.new('RGBA', (SIZE, SIZE), (0, 0, 0, 0))
+    shadow_rgba.paste((0, 0, 0, 255), (8, 14), shadow)
+    out = Image.alpha_composite(base, shadow_rgba)
+    out = Image.alpha_composite(out, bot)
+    # Keep the robot and its shadow inside the icon's rounded square.
+    out.putalpha(Image.fromarray(np.minimum(np.asarray(out)[..., 3], np.asarray(base)[..., 3])))
+    return out
+
+
+def scaled(img, px):
+    small = img.resize((px, px), Image.LANCZOS)
+    if px <= 48:
+        small = small.filter(ImageFilter.UnsharpMask(radius=1, percent=60, threshold=0))
+    return small
+
+
+if __name__ == '__main__':
+    img = compose()
+    img.save(HERE / 'icon.png')
+    sizes = [256, 128, 64, 48, 40, 32, 24, 20, 16]
+    frames = [scaled(img, s) for s in sizes]
+    frames[0].save(HERE / 'icon.ico', sizes=[(s, s) for s in sizes], append_images=frames[1:])

@@ -57,6 +57,7 @@ internal sealed class SettingsForm : Form
     public SettingsForm(AppSettings settings)
     {
         Text = "Settings";
+        Icon = Program.AppIcon;
         FormBorderStyle = FormBorderStyle.FixedDialog;
         MaximizeBox = MinimizeBox = false;
         ShowInTaskbar = false;

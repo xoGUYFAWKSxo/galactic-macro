@@ -56,6 +56,7 @@ public sealed class MainForm : Form
     public MainForm()
     {
         Text = "Galactic Macro";
+        Icon = Program.AppIcon;
         ClientSize = new Size(720, 520);
         MinimumSize = new Size(560, 360);
         StartPosition = FormStartPosition.CenterScreen;

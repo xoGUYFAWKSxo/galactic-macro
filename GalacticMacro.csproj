@@ -9,6 +9,12 @@
     <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
     <AssemblyName>GalacticMacro</AssemblyName>
     <RootNamespace>GalacticMacro</RootNamespace>
+    <ApplicationIcon>assets\icon.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Also embedded so windows can use the full-resolution icon, not just the exe's 32 px one. -->
+    <EmbeddedResource Include="assets\icon.ico" LogicalName="GalacticMacro.icon.ico" />
+  </ItemGroup>
 
 </Project>
