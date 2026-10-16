@@ -1,4 +1,4 @@
-namespace MacroRecorder;
+namespace GalacticMacro;
 
 /// <summary>
 /// Large always-on-top countdown number. Click-through and never takes focus, so the user can

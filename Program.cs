@@ -1,4 +1,4 @@
-namespace MacroRecorder;
+namespace GalacticMacro;
 
 internal static class Program
 {

@@ -1,9 +1,9 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace MacroRecorder;
+namespace GalacticMacro;
 
-/// <summary>User preferences, persisted to %APPDATA%\MacroRecorder\settings.json.</summary>
+/// <summary>User preferences, persisted to %APPDATA%\GalacticMacro\settings.json.</summary>
 public sealed class AppSettings
 {
     /// <summary>Key code combined with Control/Alt/Shift modifier flags.</summary>
@@ -11,8 +11,10 @@ public sealed class AppSettings
     public Keys PlayHotkey { get; set; } = Keys.F10;
     public int CountdownSeconds { get; set; } = 3;
 
-    private static readonly string FilePath = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "MacroRecorder", "settings.json");
+    private static readonly string AppData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+    private static readonly string FilePath = Path.Combine(AppData, "GalacticMacro", "settings.json");
+    // Settings location used before the app was renamed from Macro Recorder; read once if the new file doesn't exist.
+    private static readonly string LegacyFilePath = Path.Combine(AppData, "MacroRecorder", "settings.json");
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -24,8 +26,9 @@ public sealed class AppSettings
     {
         try
         {
-            if (File.Exists(FilePath))
-                return JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(FilePath), JsonOptions) ?? new();
+            string path = File.Exists(FilePath) ? FilePath : LegacyFilePath;
+            if (File.Exists(path))
+                return JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(path), JsonOptions) ?? new();
         }
         catch
         {

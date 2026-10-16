@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-namespace MacroRecorder;
+namespace GalacticMacro;
 
 /// <summary>Replays a macro on a background thread using SendInput.</summary>
 public sealed class Player

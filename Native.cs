@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace MacroRecorder;
+namespace GalacticMacro;
 
 internal static class Native
 {

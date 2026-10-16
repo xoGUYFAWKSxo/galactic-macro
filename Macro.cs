@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace MacroRecorder;
+namespace GalacticMacro;
 
 public enum EventKind { MouseMove, MouseDown, MouseUp, MouseWheel, MouseHWheel, KeyDown, KeyUp }
 

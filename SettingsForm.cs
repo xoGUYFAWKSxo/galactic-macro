@@ -1,4 +1,4 @@
-namespace MacroRecorder;
+namespace GalacticMacro;
 
 /// <summary>Text box that captures a key combination instead of text.</summary>
 internal sealed class HotkeyBox : TextBox

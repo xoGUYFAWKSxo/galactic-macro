@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace MacroRecorder;
+namespace GalacticMacro;
 
 public sealed class MainForm : Form
 {
@@ -55,7 +55,7 @@ public sealed class MainForm : Form
 
     public MainForm()
     {
-        Text = "Macro Recorder";
+        Text = "Galactic Macro";
         ClientSize = new Size(720, 520);
         MinimumSize = new Size(560, 360);
         StartPosition = FormStartPosition.CenterScreen;
@@ -492,7 +492,7 @@ public sealed class MainForm : Form
         _btnLoad.Enabled = _btnSave.Enabled = _btnDelete.Enabled = _btnClear.Enabled = _btnSettings.Enabled = !busy;
         _btnSave.Enabled &= _events.Count > 0;
         _chkMoves.Enabled = !_recording;
-        Text = "Macro Recorder" + (_currentFile != null ? " — " + Path.GetFileName(_currentFile) : "") + (_dirty ? " *" : "");
+        Text = "Galactic Macro" + (_currentFile != null ? " — " + Path.GetFileName(_currentFile) : "") + (_dirty ? " *" : "");
         RefreshView();
     }
 

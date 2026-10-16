@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 
-namespace MacroRecorder;
+namespace GalacticMacro;
 
 public readonly record struct KeyInput(int Vk, int Scan, bool Extended, bool Down, bool FromPlayback);
 
