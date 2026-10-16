@@ -56,7 +56,7 @@ dotnet run                               # build and launch
 dotnet publish -c Release -o publish     # portable build in publish\ (git-ignored)
 ```
 
-`installerbuild.ps1` builds the installer, `dist\GalacticMacro-Setup-<version>.exe`. It needs
+`installer\build.ps1` builds the installer, `dist\GalacticMacro-Setup-<version>.exe`. It needs
 [Inno Setup 6](https://jrsoftware.org/isinfo.php) (`winget install JRSoftware.InnoSetup`) and takes the version from
 `<Version>` in `GalacticMacro.csproj`. The app is published self-contained, so the installer bundles the .NET runtime.
 
